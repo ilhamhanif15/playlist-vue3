@@ -4,39 +4,84 @@
     </div>
 
     <div class="mb-7">
-        <AlbumListCard
-            title="Palette"
-            singer="IU"
-            publishYear="2017"
-            imageUrl="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/IU_Palette_final.jpg/220px-IU_Palette_final.jpg"
-            singerImageUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRybjsuu6vJJKvB_LYmWwJI9Jpn_J5Xr9x34g&usqp=CAU"
-        />
+        <template v-if="album">
+            <AlbumListCard
+                :_id="album._id"
+                :title="album.title"
+                :singer="album.artist.name"
+                :publishYear="album.publishYear"
+                :imageUrl="album.imageUrl"
+                :singerImageUrl="album.artist.imageUrl"
+            />
+        </template>
     </div>
+    
+    <form @submit.prevent="saveSong">
+        <div class="space-y-4 mb-10">
+            <div class="space-y-1">
+                <label for="title" class="text-white">Song Title</label>
+                <input type="text" name="title" v-model="songForm.title" placeholder="First Love" class="py-2 px-3 rounded shadow-2xl bg-neutral-100 w-full">
+            </div>
 
-    <div class="space-y-4 mb-10">
-        <div class="space-y-1">
-            <label for="title" class="text-white">Song Title</label>
-            <input type="text" name="title" placeholder="First Love" class="py-2 px-3 rounded shadow-2xl bg-neutral-100 w-full">
+            <div class="space-y-1">
+                <label for="youtube_url" class="text-white">Youtube Embed (URL)</label>
+                <input type="text" name="youtube_url" v-model="songForm.youtubeUrl" placeholder="https://www.youtube.com/embed/8zsYZFvKniw" class="py-2 px-3 rounded shadow-2xl bg-neutral-100 w-full">
+            </div>
         </div>
 
-        <div class="space-y-1">
-            <label for="title" class="text-white">Youtube Embed (URL)</label>
-            <input type="text" name="title" placeholder="https://www.youtube.com/embed/8zsYZFvKniw" class="py-2 px-3 rounded shadow-2xl bg-neutral-100 w-full">
+        <div>
+            <BaseButton buttonType="submit" :loading="isSaveLoading" class="py-2 px-3 w-full bg-primary-blue text-white font-semibold uppercase rounded active:bg-sky-500 duration-200" type="Primary">Save</BaseButton>
         </div>
-    </div>
-
-    <div>
-        <button class="py-2 px-3 w-full bg-primary-blue text-white font-semibold uppercase rounded active:bg-sky-500 duration-200">Save</button>
-    </div>
+    </form>
 </template>
 
 <script>
+import { reactive, ref } from 'vue'
 import AlbumListCard from "../../components/list/AlbumListCard.vue"
+import api from "../../plugins/axios"
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
     name: "song-form-view",
     components: {
         AlbumListCard
+    },
+    setup() {
+        const route     = useRoute()
+        const showAlbum = ref(false)
+        const album     = ref(null)
+
+        const fetchAlbum = (albumId) => {
+            return api.get(`album/${albumId}`).then(resp => {
+                const data = resp.data.data
+                album.value = data
+                showAlbum.value = true
+            })
+        }
+
+        fetchAlbum(route.params.id)
+
+        // Song Form
+        const songForm  = ref({
+            title: "",
+            youtubeUrl: "",
+            album: route.params.id
+        })
+        const isSaveLoading = ref(false)
+        const saveSong = async () => {
+            isSaveLoading.value = true
+            await api.post(`song`, songForm.value)
+            isSaveLoading.value = false
+        }
+
+        return {
+            album,
+            showAlbum,
+            songForm,
+            isSaveLoading,
+            saveSong
+        }
+
     }
 }
 </script>

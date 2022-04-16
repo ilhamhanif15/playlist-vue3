@@ -12,21 +12,19 @@
 
   <div class="flex flex-col space-y-4">
 
-    <AlbumListCard
-      title="Palette"
-      singer="IU"
-      publishYear="2017"
-      imageUrl="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/IU_Palette_final.jpg/220px-IU_Palette_final.jpg"
-      singerImageUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRybjsuu6vJJKvB_LYmWwJI9Jpn_J5Xr9x34g&usqp=CAU"
-    />
-    
-    <AlbumListCard
-      title="Divide"
-      singer="Ed Sheeran"
-      publishYear="2017"
-      imageUrl="https://upload.wikimedia.org/wikipedia/id/thumb/4/45/Divide_cover.png/220px-Divide_cover.png"
-      singerImageUrl="https://i.scdn.co/image/ab6761610000e5eb12a2ef08d00dd7451a6dbed6"
-    />
+    <div
+      v-for="album in albums"
+      :key="album._id"
+    >
+      <AlbumListCard
+        :_id="album._id"
+        :title="album.title"
+        :singer="album.artist.name"
+        :publishYear="album.publishYear"
+        :imageUrl="album.imageUrl"
+        :singerImageUrl="album.artist.imageUrl"
+      />
+    </div>
 
   </div>
 </template>
@@ -34,6 +32,8 @@
 <script>
 import AlbumListCard from "../components/list/AlbumListCard.vue"
 import iconPlus from "../assets/icons/SVG/Plus.svg"
+import api from "../plugins/axios"
+import { ref } from 'vue'
 
 export default {
   name: "home-view",
@@ -41,8 +41,20 @@ export default {
     AlbumListCard
   },
   setup() {
+    
+    const albums = ref([])
+    const fetchAlbums = () => {
+      return api.get("album").then(resp => {
+        const data = resp.data.data
+        albums.value = data
+      })
+    }
+
+    fetchAlbums()
+
     return {
-      iconPlus
+      iconPlus,
+      albums
     }
   }
 }

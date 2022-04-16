@@ -14,9 +14,13 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faPlus)
 
+import { BaseButton, BaseIcon } from "@ilhamhanif15/ilhamhanif15-medic-app-lib"
+
 const app = createApp(App)
 
 app.component("font-awesome-icon", FontAwesomeIcon)
+    .component('BaseButton', BaseButton)
+    .component('BaseIcon', BaseIcon)
 
 app.use(createPinia())
 app.use(VuePlyr, {

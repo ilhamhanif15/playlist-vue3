@@ -12,31 +12,59 @@
 
   <div class="flex flex-col space-y-4">
 
-    <SongListCard
-      title="Palette"
-      singer="IU"
-      timeLength="3:10"
-      imageUrl="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/IU_Palette_final.jpg/220px-IU_Palette_final.jpg"
-    />
-    
-    <SongListCard
-      title="Ending Scene"
-      singer="IU"
-      timeLength="3:10"
-      imageUrl="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/IU_Palette_final.jpg/220px-IU_Palette_final.jpg"
-    />
+    <div
+      v-for="song in songs"
+      :key="song"
+    >
+      <SongListCard
+        :youtubeUrl="song.youtubeUrl"
+        :_id="song._id"
+        :title="song.title"
+        :singer="album.artist.name"
+        timeLength="3:10"
+        :imageUrl="album.imageUrl"
+      />
+    </div>
 
   </div>
 
 </template>
 
 <script>
+import { ref } from 'vue'
 import SongListCard from "../../components/list/SongListCard.vue"
+import api from "../../plugins/axios"
+import { useRoute } from 'vue-router'
+import { useAlbumStore } from "../../stores/album"
 
 export default {
     name: "song-list-view",
     components: {
       SongListCard
+    },
+    setup() {
+      const route = useRoute()
+      const albumStore = useAlbumStore()
+
+      const songs = ref([])
+      const album = ref(null)
+
+      const fetchSong = (albumId) => {
+        return api.get(`album/${albumId}`).then(resp => {
+          const data = resp.data.data
+          album.value = data
+          albumStore.choosenAlbum = data
+          songs.value = data.songs
+        })
+      }
+
+      fetchSong(route.params.id);
+
+
+      return {
+        songs,
+        album
+      }
     }
 }
 </script>

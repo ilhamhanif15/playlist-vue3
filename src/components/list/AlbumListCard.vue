@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="{ name:'albumSongs', params: { id: 1 } }">
+    <router-link :to="{ name:'albumSongs', params: { id: _id } }">
         <div class="px-2 py-3 rounded-lg shadow-2xl bg-primary-blue transform hover:scale-105 duration-200 hover:bg-sky-700 cursor-pointer group">
             <div class="flex justify-between">
                 
@@ -9,10 +9,10 @@
                     </div>
                     <div class="text-white flex flex-col justify-between">
                         <div>
-                            <div class="text-xl">{{ title }}</div>
-                            <div class="text-sm mb-3">{{ publishYear }}</div>
+                            <div class="text-lg font-semibold">{{ title }}</div>
+                            <div class="text-xs mb-3">{{ publishYear }}</div>
                         </div>
-                        <div>{{ singer }}</div>
+                        <div class="text-sm font-semibold">{{ singer }}</div>
                     </div>
                 </div>
 
@@ -28,6 +28,9 @@
 <script>
 export default {
     props: {
+        _id: {
+            type: String,
+        },
         imageUrl: {
             type: String
         },
@@ -35,7 +38,7 @@ export default {
             type: String
         },
         publishYear: {
-            type: String
+            type: Number
         },
         singer: {
             type: String
